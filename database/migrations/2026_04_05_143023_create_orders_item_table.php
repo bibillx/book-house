@@ -8,19 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->string('book_id');
-            $table->string('book_title');
-            $table->string('book_author');
-            $table->string('book_cover')->nullable();
-            $table->decimal('book_price', 12, 2);
-            $table->enum('book_type', ['physical', 'digital'])->default('physical');
-            $table->integer('quantity')->default(1);
-            $table->decimal('subtotal', 12, 2);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('order_items')) {
+            Schema::create('order_items', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('order_id')->constrained()->onDelete('cascade');
+                $table->string('book_id');
+                $table->string('book_title');
+                $table->string('book_author');
+                $table->string('book_cover')->nullable();
+                $table->decimal('book_price', 12, 2);
+                $table->enum('book_type', ['physical', 'digital'])->default('physical');
+                $table->integer('quantity')->default(1);
+                $table->decimal('subtotal', 12, 2);
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

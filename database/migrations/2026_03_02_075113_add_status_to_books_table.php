@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('books', 'status')) {
-            Schema::table('books', function (Blueprint $table) {
-                $table->string('status')->default('available');
-            });
-        }
+// status already included in create_books_table
     }
 
     /**

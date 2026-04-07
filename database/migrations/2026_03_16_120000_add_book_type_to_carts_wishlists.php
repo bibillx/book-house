@@ -11,17 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('carts', function (Blueprint $table) {
-            if (!Schema::hasColumn('carts', 'book_type')) {
-                $table->enum('book_type', ['physical', 'digital'])->default('physical')->after('book_price');
-            }
-        });
-
-        Schema::table('wishlists', function (Blueprint $table) {
-            if (!Schema::hasColumn('wishlists', 'book_type')) {
-                $table->enum('book_type', ['physical', 'digital'])->default('physical')->after('book_price');
-            }
-        });
+// book_type already exists from create migration
     }
 
     /**
