@@ -71,14 +71,15 @@ class CheckoutController extends Controller
         // Generate order number
         $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid());
 
-        // Create order
+// Create order
         $order = Order::create([
             'user_id' => Auth::id(),
+            'order_number' => $orderNumber,
             'total_amount' => $totalAmount,
             'status' => 'pending'
         ]);
 
-        // Skip extra fields - create basic order only (DB issue)
+        // Order created successfully with order number
         // Create order items and update stock
         foreach ($cartItems as $cartItem) {
             // Create order item

@@ -48,7 +48,7 @@ class BooksController extends Controller
     */
     public function adminDashboard()
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
@@ -77,7 +77,7 @@ class BooksController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                    ->orWhere('authors', 'like', '%' . $request->search . '%');
+                    ->orWhere('author', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -141,7 +141,7 @@ class BooksController extends Controller
     */
     public function manageBooks()
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
@@ -156,7 +156,7 @@ class BooksController extends Controller
     */
     public function create()
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             abort(403);
         }
 
@@ -170,13 +170,13 @@ class BooksController extends Controller
     */
     public function store(Request $request)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
+        if (!Auth::check()) {
             abort(403);
         }
 
         $request->validate([
             'title'     => 'required',
-            'authors'   => 'required',
+            'author'   => 'required',
             'price'     => 'required|numeric',
             'stock'     => 'required|numeric',
             'book_type' => 'required|in:physical,digital',
@@ -188,7 +188,7 @@ class BooksController extends Controller
 
         $book = Book::create([
             'title'     => $request->title,
-            'authors'   => $request->authors,
+            'author'   => $request->author,
             'price'     => $request->price,
             'stock'     => $request->stock,
             'book_type' => $request->book_type,
@@ -233,7 +233,7 @@ class BooksController extends Controller
 
         $request->validate([
             'title'     => 'required',
-            'authors'   => 'required',
+            'author'   => 'required',
             'price'     => 'required|numeric',
             'stock'     => 'required|numeric',
             'book_type' => 'required|in:physical,digital',
@@ -247,9 +247,9 @@ class BooksController extends Controller
             $book->cover = $coverPath;
         }
 
-        $book->update([
+            $book->update([
             'title'     => $request->title,
-            'authors'   => $request->authors,
+            'author'   => $request->author,
             'price'     => $request->price,
             'stock'     => $request->stock,
             'book_type' => $request->book_type,
@@ -298,7 +298,7 @@ class BooksController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                    ->orWhere('authors', 'like', '%' . $request->search . '%');
+                    ->orWhere('author', 'like', '%' . $request->search . '%');
             });
         }
 

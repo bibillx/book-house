@@ -204,12 +204,15 @@
 
 <body>
 
-    <div class="page-wrapper">
+        <div class="page-wrapper">
 
         <div class="page-header">
             <div class="label">Admin Panel</div>
             <h1>Dashboard</h1>
-            <p>Selamat datang, kelola konten perpustakaan dari sini.</p>
+            <p>Selamat datang Admin, {{ Auth::user()->name }}! Kelola konten perpustakaan dari sini. <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="logout-btn" style="color: var(--accent-light); text-decoration: none; font-weight: 500;">Logout</a></p>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
         </div>
 
         <!-- Stats -->
@@ -247,6 +250,22 @@
                 <div class="menu-info">
                     <span class="menu-title">Tambah Buku</span>
                     <span class="menu-desc">Upload buku baru ke koleksi</span>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+            <a href="{{ route('admin.users') }}" class="menu-card">
+                <div class="menu-icon">👥</div>
+                <div class="menu-info">
+                    <span class="menu-title">Kelola Users</span>
+                    <span class="menu-desc">Lihat semua users terdaftar</span>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+            <a href="{{ route('admin.orders') }}" class="menu-card">
+                <div class="menu-icon">📦</div>
+                <div class="menu-info">
+                    <span class="menu-title">Kelola Orders</span>
+                    <span class="menu-desc">Update status orders & lihat detail</span>
                 </div>
                 <span class="arrow">→</span>
             </a>

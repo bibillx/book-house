@@ -300,11 +300,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="authors">Penulis</label>
-                    <input type="text" id="authors" name="authors"
+                    <label for="author">Penulis</label>
+                    <input type="text" id="author" name="author"
                            placeholder="Nama penulis"
-                           value="{{ old('authors') }}"
-                           class="{{ $errors->has('authors') ? 'is-invalid' : '' }}"
+                           value="{{ old('author') }}"
+                           class="{{ $errors->has('author') ? 'is-invalid' : '' }}"
                            required>
                 </div>
 

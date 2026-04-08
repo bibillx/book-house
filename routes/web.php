@@ -8,7 +8,8 @@
     use App\Http\Controllers\ProfileController;
     use App\Http\Controllers\CartController;
     use App\Http\Controllers\WishlistController;
-    use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\AdminController;
 
     /*
     |--------------------------------------------------------------------------
@@ -100,7 +101,7 @@
         // ADMIN ROUTES
         // ===============================
 
-        Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+        Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
 
             // Dashboard
             Route::get('/', [BooksController::class, 'adminDashboard'])
@@ -133,5 +134,12 @@
             // Hapus Buku
             Route::delete('/books/{id}', [BooksController::class, 'destroy'])
                 ->name('books.destroy');
+            
+            // Users management
+            Route::get('/users', [AdminController::class, 'users'])->name('users');
+            
+            // Orders management
+            Route::get('/orders', [AdminController::class, 'orders'])->name('orders');
+            Route::post('/orders/{orderId}/status', [AdminController::class, 'updateOrderStatus'])->name('orders.status');
         });
     });
