@@ -577,7 +577,7 @@
                         @foreach ($cartItems as $item)
                             <div class="cart-item">
                                 <div class="cart-item-image">
-                                    <img src="{{ asset('storage/' . $item->book_cover) }}" alt="{{ $item->book_title }}">
+                                    <img src="{{ $item->book_cover ?: 'https://via.placeholder.com/60x80/2a231c/8b7355?text=No+Cover' }}" alt="{{ $item->book_title }}" onerror="this.src='https://via.placeholder.com/60x80/2a231c/8b7355?text=No+Cover'">
                                 </div>
                                 <div class="cart-item-details">
                                     <div class="cart-item-title">{{ $item->book_title }}</div>

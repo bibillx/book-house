@@ -197,7 +197,8 @@
         }
 
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        select.input-like-select {
             width: 100%;
             padding: 14px 45px 14px 15px;
             border: 2px solid rgba(210, 180, 140, 0.3);
@@ -207,6 +208,14 @@
             transition: all 0.3s;
             color: #f4e4c1;
             font-family: 'Segoe UI', sans-serif;
+        }
+
+        select.input-like-select {
+            padding-right: 15px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d2b48c' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
         }
 
         input:focus {
@@ -434,6 +443,14 @@
                         Remember me
                     </label>
                     <a href="{{ route('password.request') }}">Forgot Password?</a>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role_select">Masuk sebagai</label>
+                    <select id="role_select" name="role_select" class="input-like-select">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
 
                 <button type="submit" class="submit-btn">Login</button>

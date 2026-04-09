@@ -363,7 +363,7 @@
                 <div class="action-buttons">
                     @if($stock > 0)
                         <!-- Buy Now -->
-                        <button class="btn-buy-now" id="btnBuyNow" >
+<button id="btnBuyNow" form="buyNowForm" type="submit" class="btn-buy-now">
                             ⚡ Beli Sekarang
                         </button>
 
@@ -403,9 +403,9 @@
                 <!-- Meta Grid -->
                 <div class="meta-grid">
                     <div class="meta-item">
-                        <div class="meta-icon">📄</div>
-                        <div class="meta-value">{{ $book->pages ?? '-' }}</div>
-                        <div class="meta-label">Halaman</div>
+                        <div class="meta-icon">📖</div>
+                        <div class="meta-value">{{ ($book->book_type ?? 'physical') === 'physical' ? 'Buku Fisik' : 'Digital (PDF)' }}</div>
+                        <div class="meta-label">Tipe Buku</div>
                     </div>
                     <div class="meta-item">
                         <div class="meta-icon">🏷️</div>

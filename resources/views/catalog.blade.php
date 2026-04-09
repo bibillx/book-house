@@ -932,9 +932,7 @@
                 if (result.success) {
                     allBooks = result.data.map(book => ({
                         ...book,
-                        cover: book.cover ?
-                            '{{ asset('storage') }}/' + book.cover :
-                            null
+                        cover: book.cover || null
                     }));
                     applyFilters();
                 }

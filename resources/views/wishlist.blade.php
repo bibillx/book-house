@@ -374,7 +374,7 @@
                         <button class="remove-wishlist-btn"
                             onclick="removeFromWishlist({{ $item->id }})">✕</button>
                         <div class="book-cover">
-                            <img src="{{ $item->book_cover }}" alt="{{ $item->book_title }}">
+                            <img src="{{ $item->book_cover ? asset('storage/' . $item->book_cover) : 'https://via.placeholder.com/200x260/2a231c/8b7355?text=No+Cover' }}" alt="{{ $item->book_title }}" onerror="this.src='https://via.placeholder.com/200x260/2a231c/8b7355?text=No+Cover'">
                         </div>
                         <div class="book-info">
                             <div class="book-title">{{ $item->book_title }}</div>

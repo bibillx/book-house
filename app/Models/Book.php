@@ -8,17 +8,20 @@ class Book extends Model
 {
     protected $fillable = [
         'title',
+        'author',
         'authors',
         'publisher',
         'description',
         'cover',
-        'book_type',
+        'type',
         'price',
         'published_date',
         'stock',
         'synopsis',
         'genre',
         'status',
+        'isbn',
+        'book_type',
     ];
 
     // Scope untuk mengambil buku yang tersedia saja
@@ -27,3 +30,4 @@ class Book extends Model
         return $query->where('status', 'available');
     }
 }
+

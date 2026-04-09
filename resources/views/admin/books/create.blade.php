@@ -286,6 +286,7 @@
     <div class="card">
         <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            @method('POST')
 
             <div class="section-label">Informasi Buku</div>
             <div class="form-grid">
@@ -343,8 +344,8 @@
 
                 <div class="form-group">
                     <label for="book_type">Tipe Buku</label>
-                    <select id="book_type" name="book_type"
-                            class="{{ $errors->has('book_type') ? 'is-invalid' : '' }}"
+                    <select id="type" name="type"
+                            class="{{ $errors->has('type') ? 'is-invalid' : '' }}"
                             required>
                         <option value="physical" {{ old('book_type') == 'physical' ? 'selected' : '' }}>Buku Fisik</option>
                         <option value="digital" {{ old('book_type') == 'digital' ? 'selected' : '' }}>E-Book (PDF)</option>

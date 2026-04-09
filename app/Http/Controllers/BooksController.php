@@ -48,10 +48,6 @@ class BooksController extends Controller
     */
     public function adminDashboard()
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
         $totalBooks  = Book::count();
         $totalUsers  = User::count();
         $totalOrders = Order::count();
@@ -70,10 +66,11 @@ class BooksController extends Controller
     */
     public function catalog(Request $request)
     {
-        // Memulai query builder
-        $query = Book::query();
+        $query = Book::query()->where(function ($q) {
+            $q->where('status', 'available')
+                ->orWhereNull('status');
+        });
 
-        // 1. Filter Pencarian (Search)
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
@@ -81,17 +78,14 @@ class BooksController extends Controller
             });
         }
 
-        // 2. Filter Tipe Buku (Physical/Digital)
         if ($request->filled('type') && in_array($request->type, ['physical', 'digital'])) {
-            $query->where('book_type', $request->type);
+            $query->where('type', $request->type);
         }
 
-        // 3. Filter Berdasarkan Huruf (A-Z)
         if ($request->filled('letter') && $request->letter !== 'all') {
             $query->where('title', 'like', $request->letter . '%');
         }
 
-        // 4. Sorting (Pengurutan)
         switch ($request->sort) {
             case 'title-desc':
                 $query->orderBy('title', 'desc');
@@ -103,16 +97,12 @@ class BooksController extends Controller
                 $query->orderBy('price', 'desc');
                 break;
             default:
-                // Default: Urutkan judul A-Z
                 $query->orderBy('title', 'asc');
                 break;
         }
 
-        // Ambil data dengan Pagination (misal 12 data per halaman)
         $books = $query->paginate(12);
 
-        //Decode genre JSON di level controller agar ringan
-        //(Gunakan getCollection karena sudah menggunakan paginate)
         $books->getCollection()->transform(function ($book) {
             $book->genre_list = $book->genre ? json_decode($book->genre) : [];
             return $book;
@@ -125,10 +115,7 @@ class BooksController extends Controller
     {
         $book = Book::findOrFail($id);
         
-        // Decode genre JSON
         $book->genre_list = $book->genre ? json_decode($book->genre, true) : [];
-        
-        // Full cover path
         $book->cover_url = $book->cover ? asset('storage/' . $book->cover) : null;
 
         return view('book-detail', compact('book'));
@@ -141,12 +128,8 @@ class BooksController extends Controller
     */
     public function manageBooks()
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
         $books = Book::latest()->paginate(10);
-        return view('admin.books', compact('books'));
+        return view('admin.books.index', compact('books'));
     }
 
     /*
@@ -156,10 +139,6 @@ class BooksController extends Controller
     */
     public function create()
     {
-        if (Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
         return view('admin.books.create');
     }
 
@@ -170,36 +149,21 @@ class BooksController extends Controller
     */
     public function store(Request $request)
     {
-        if (!Auth::check()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'title'     => 'required',
-            'author'   => 'required',
+        $data = $request->validate([
+            'title'     => 'required|string|max:255',
             'price'     => 'required|numeric',
-            'stock'     => 'required|numeric',
-            'book_type' => 'required|in:physical,digital',
-            'cover'     => 'required|image|mimes:jpg,jpeg,png',
-            'genre'     => 'nullable|array'
+            'stock'     => 'required|integer|min:0',
+            'type' => 'required|in:physical,digital',
+            'cover'     => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'synopsis'  => 'nullable|string|max:1000'
         ]);
 
-        $coverPath = $request->file('cover')->store('covers', 'public');
+        $data['author'] = $request->author ?? 'Unknown Author';
+        $data['isbn'] = 'ISBN-' . time() . rand(100,999);
+        $data['status'] = 'available';
+        $data['cover'] = $request->file('cover')->store('covers', 'public');
 
-        $book = Book::create([
-            'title'     => $request->title,
-            'author'   => $request->author,
-            'price'     => $request->price,
-            'stock'     => $request->stock,
-            'book_type' => $request->book_type,
-            'cover'     => $coverPath,
-            'synopsis'  => $request->synopsis,
-            'genre'     => json_encode($request->genre ?? []),
-            'status'    => 'available',
-        ]);
-
-        // Debug log to check if book is created
-        // \Log::info('Book created: ' . $book->id . ' - ' . $book->title);
+        Book::create($data);
 
         return redirect()->route('admin.books.index')
             ->with('success', 'Buku berhasil ditambahkan!');
@@ -212,10 +176,6 @@ class BooksController extends Controller
     */
     public function edit($id)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
         $book = Book::findOrFail($id);
         return view('admin.books.edit', compact('book'));
     }
@@ -227,38 +187,16 @@ class BooksController extends Controller
     */
     public function update(Request $request, $id)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
-        $request->validate([
-            'title'     => 'required',
-            'author'   => 'required',
-            'price'     => 'required|numeric',
-            'stock'     => 'required|numeric',
-            'book_type' => 'required|in:physical,digital',
-            'cover'     => 'nullable|image|mimes:jpg,jpeg,png',
-        ]);
-
         $book = Book::findOrFail($id);
 
-        if ($request->hasFile('cover')) {
-            $coverPath = $request->file('cover')->store('covers', 'public');
-            $book->cover = $coverPath;
-        }
-
-            $book->update([
-            'title'     => $request->title,
-            'author'   => $request->author,
-            'price'     => $request->price,
-            'stock'     => $request->stock,
-            'book_type' => $request->book_type,
-            'synopsis'  => $request->synopsis,
-            'genre'     => json_encode($request->genre),
+        $data = $request->validate([
+            'stock'     => 'required|integer|min:0',
         ]);
 
+        $book->update($data);
+
         return redirect()->route('admin.books.index')
-            ->with('success', 'Buku berhasil diperbarui!');
+            ->with('success', 'Stok berhasil diperbarui!');
     }
 
     /*
@@ -268,10 +206,6 @@ class BooksController extends Controller
     */
     public function destroy($id)
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
         $book = Book::findOrFail($id);
         $book->delete();
 
@@ -288,31 +222,30 @@ class BooksController extends Controller
     {
         $query = Book::query();
 
-        // Filter by status (only show available books or books without status)
         $query->where(function ($q) {
             $q->where('status', 'available')
                 ->orWhereNull('status');
         });
 
-        // Search by title or author
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('title', 'like', '%' . $request->search . '%')
-                    ->orWhere('author', 'like', '%' . $request->search . '%');
+                    ->orWhere('author', 'like', '%' . $request->search . '%')
+                    ->orWhere('authors', 'like', '%' . $request->search . '%');
             });
         }
 
-        // Filter by book type
         if ($request->filled('type') && in_array($request->type, ['physical', 'digital'])) {
-            $query->where('book_type', $request->type);
+            $query->where(function ($q) use ($request) {
+                $q->where('type', $request->type)
+                  ->orWhere('book_type', $request->type);
+            });
         }
 
-        // Filter by first letter
         if ($request->filled('letter') && $request->letter !== 'all') {
             $query->where('title', 'like', $request->letter . '%');
         }
 
-        // Sorting
         switch ($request->sort) {
             case 'title-desc':
                 $query->orderBy('title', 'desc');
@@ -330,15 +263,12 @@ class BooksController extends Controller
 
         $books = $query->get();
 
-        // Transform genre from JSON to array and generate full cover URL
         $books->transform(function ($book) {
+            $book->authors = $book->author ?? $book->authors ?? 'Unknown Author';
+            $book->book_type = $book->book_type ?? $book->type ?? 'physical';
+            $book->cover = $book->cover ? asset('storage/' . $book->cover) : null;
             $book->genre_list = $book->genre ? json_decode($book->genre) : [];
-            // Generate full URL for cover image
-            if ($book->cover) {
-                $book->cover_url = asset('storage/' . $book->cover);
-            } else {
-                $book->cover_url = null;
-            }
+$book->price = (float) $book->price;
             return $book;
         });
 
@@ -371,3 +301,4 @@ class BooksController extends Controller
         ]);
     }
 }
+

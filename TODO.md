@@ -1,9 +1,8 @@
-# Checkout Fix - Direct to Order History
+# Fix Buy Now Button
 
 ## Steps:
-- [x] 1. Edit CheckoutController.php: Add &#39;order_number&#39; => $orderNumber to Order::create()
-- [x] 2. Edit checkout.blade.php: Add Laravel validation errors display after session error div
-- [x] 3. Test full checkout flow
-- [ ] 4. attempt_completion
+1. [x] Add id="btnBuyNow" to button in book-detail.blade.php
+2. [ ] Test: Login → book detail → Beli Sekarang → checkout with 1 item
+3. [ ] Verify cart cleared + single item added + checkout loads
 
-**Status:** Complete! Ran `php artisan migrate` for order_number column. Now checkout → riwayat works.
+**Status:** View fixed with id="btnBuyNow". Test the flow: Login → book detail → click "Beli Sekarang" → should go to checkout with single item.

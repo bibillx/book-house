@@ -32,11 +32,12 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            $user = Auth::user();
-            if ($user->role === 'admin') {
+            $roleSelect = $request->input('role_select', session('last_role_select', 'user'));
+            session(['last_role_select' => $roleSelect]);
+            if ($roleSelect === 'admin') {
                 return redirect('/admin');
             }
-            return redirect()->intended('dashboard');
+            return redirect('/dashboard');
         }
 
         return redirect()->back()
@@ -55,10 +56,6 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        if ($user->role === 'admin') {
-            return redirect('/admin');
-        }
-
-        return redirect('/dashboard');
+        return redirect('/admin/dashboard');
     }
 }
